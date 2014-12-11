@@ -129,7 +129,6 @@ USApolygons <- map2SpatialPolygons(mapUSA,  IDs = nms,  CRS('+proj=longlat'))
 
 
 positive_data_for_heatmap$abrv <- tolower(state.name[match(positive_data_for_heatmap$State_code,  state.abb)])
-positive_data_for_heatmap= positive_data_for_heatmap
 
 idx <- match(unique(nms), positive_data_for_heatmap$abrv)
 dat2 <- data.frame(value = positive_data_for_heatmap$Sentiment_Score[idx], state = unique(nms))
