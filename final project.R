@@ -1,3 +1,5 @@
+
+Tweets=read.csv("Tweets.csv")
 tweets = subset(Tweets, Tweets$Language=='en')
 install.packages("twitteR")
 library(twitteR)
@@ -81,20 +83,20 @@ global_score = round( 100 * numpos / (numpos + numneg) )
 tweets$Time.Stamp = as.Date(gsub("T"," ", tweets$Universal.Time.Stamp))
 
 
-ggplot(tweets, aes(x=Time.Stamp, y=Text, fill=score)) +
-  geom_bar(stat='identity')
-
-
 vals = (aggregate(Text ~ score +Time.Stamp,data = tweets, FUN=length))
 vals$Text[vals$score<0] = -1*vals$Text[vals$score<0]
 vals$pos[vals$Text>0 & vals$score >0] =1
 vals$pos[vals$Text>0 &vals$score==0]=0
 vals$pos[vals$Text<0]=-1
 
-install.packages("scales")
-ggplot(data = vals, aes(x = Time.Stamp, y = Text, fill=factor(pos))) + 
-  geom_bar(stat = "identity", position="identity")+ scale_x_date(labels = date_format("%b-%d"),breaks = date_breaks("3 days"))
+library("scales")
+ggplot(data = vals, aes(x = Time.Stamp, y = Text, fill=factor(pos)))+  geom_bar(stat = "identity", position="identity")+ scale_x_date(labels = date_format("%b-%d"),breaks = date_breaks("3 days"))+ ggtitle("Frequency of Positive, Negative and Neutral #Netneutrality Tweets")+scale_fill_discrete(name="Sentiment Score",
+                     breaks=c("-1", "0", "1"),
+                     labels=c("Negative", "Neutral", "Positive"))
 
+###The code joins the text column into a string vector and then creates a corpus of all of the words
+###removed punctuation, converted to lower case, and then removed stop words. Created a document term matrix from these words
+### found frequency of words and plotted the 100 most frequent words
 library(tm)
 library(wordcloud)
 library(RColorBrewer)
@@ -111,7 +113,38 @@ m <- as.matrix(tdm)
 v <- sort(rowSums(m),decreasing=TRUE)
 d <- data.frame(word = names(v),freq=v)
 pal=brewer.pal(6,"Dark2")
-png("wordcloud.png", width=1280,height=800)
-wordcloud(d$word,d$freq,scale=c(4, 1.2),min.freq=1500,max.words=100, random.order=T,color=pal, rot.per=.15, vfont=c("sans serif","plain"))
+wordcloud(d$word,d$freq,min.freq=1500,max.words=Inf, random.order=FALSE, rot.per=.15, colors=pal)
+dev.off()
+
+####Positive Words
+corp <-Corpus(VectorSource(enc2utf8(as.character(paste(tweets$Text[tweets$very.pos==1],collapse=" ")))))
+corp <- tm_map(corp, removePunctuation)
+corp <- tm_map(corp, content_transformer(tolower))
+corp <- tm_map(corp,FUN= function(x) removeWords(x, stopwords("english")))
+corp = tm_map(corp, function(x) removeWords(x, c("isp","isps","amppure","amptitle","will","gonna","thing","just","like","wants","dear","want","doesnt","can","youre","let","dont","tell","net", "neutrality","netneutrality","RT", "amp")))
+
+tdm <- TermDocumentMatrix(corp)
+m <- as.matrix(tdm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+pal=brewer.pal(6,"Dark2")
+wordcloud(d$word,d$freq, scale=c(8,.2),min.freq=100,max.words=Inf, random.order=FALSE, rot.per=.15, colors=pal)
+dev.off()
+
+
+###Positive Words
+
+corp <-Corpus(VectorSource(enc2utf8(as.character(paste(tweets$Text[tweets$very.neg==1],collapse=" ")))))
+corp <- tm_map(corp, removePunctuation)
+corp <- tm_map(corp, content_transformer(tolower))
+corp <- tm_map(corp,FUN= function(x) removeWords(x, stopwords("english")))
+corp = tm_map(corp, function(x) removeWords(x, c("isp","isps","amppure","amptitle","will","gonna","thing","just","like","wants","dear","want","doesnt","can","youre","let","dont","tell","net", "neutrality","netneutrality","RT", "amp")))
+
+tdm <- TermDocumentMatrix(corp)
+m <- as.matrix(tdm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+pal=brewer.pal(6,"Dark2")
+wordcloud(d$word,d$freq, min.freq=100,max.words=Inf, random.order=FALSE, rot.per=.15, colors=pal)
 dev.off()
 
