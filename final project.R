@@ -90,6 +90,7 @@ vals$pos[vals$Text>0 &vals$score==0]=0
 vals$pos[vals$Text<0]=-1
 
 library("scales")
+
 ggplot(data = vals, aes(x = Time.Stamp, y = Text, fill=factor(pos)))+  geom_bar(stat = "identity", position="identity")+ scale_x_date(labels = date_format("%b-%d"),breaks = date_breaks("3 days"))+ ggtitle("Frequency of Positive, Negative and Neutral #Netneutrality Tweets")+scale_fill_discrete(name="Sentiment Score",
                      breaks=c("-1", "0", "1"),
                      labels=c("Negative", "Neutral", "Positive"))
@@ -113,7 +114,7 @@ m <- as.matrix(tdm)
 v <- sort(rowSums(m),decreasing=TRUE)
 d <- data.frame(word = names(v),freq=v)
 pal=brewer.pal(6,"Dark2")
-wordcloud(d$word,d$freq,min.freq=1500,max.words=Inf, random.order=FALSE, rot.per=.15, colors=pal)
+wordcloud(d$word,d$freq,min.freq=1500,max.words=100, random.order=T,color=pal, rot.per=.15, vfont=c("sans serif","plain"))
 dev.off()
 
 ####Positive Words
@@ -128,7 +129,8 @@ m <- as.matrix(tdm)
 v <- sort(rowSums(m),decreasing=TRUE)
 d <- data.frame(word = names(v),freq=v)
 pal=brewer.pal(6,"Dark2")
-wordcloud(d$word,d$freq, scale=c(8,.2),min.freq=100,max.words=Inf, random.order=FALSE, rot.per=.15, colors=pal)
+
+wordcloud(d$word,d$freq,min.freq=10,max.words=100, random.order=T,color=pal, rot.per=.15, vfont=c("sans serif","plain"))
 dev.off()
 
 
@@ -145,6 +147,7 @@ m <- as.matrix(tdm)
 v <- sort(rowSums(m),decreasing=TRUE)
 d <- data.frame(word = names(v),freq=v)
 pal=brewer.pal(6,"Dark2")
-wordcloud(d$word,d$freq, min.freq=100,max.words=Inf, random.order=FALSE, rot.per=.15, colors=pal)
+
+wordcloud(d$word,d$freq,min.freq=10,max.words=100, random.order=T,color=pal, rot.per=.15, vfont=c("sans serif","plain"))
 dev.off()
 
