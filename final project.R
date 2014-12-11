@@ -91,7 +91,7 @@ vals$pos[vals$Text>0 & vals$score >0] =1
 vals$pos[vals$Text>0 &vals$score==0]=0
 vals$pos[vals$Text<0]=-1
 
-
+install.packages("scales")
 ggplot(data = vals, aes(x = Time.Stamp, y = Text, fill=factor(pos))) + 
   geom_bar(stat = "identity", position="identity")+ scale_x_date(labels = date_format("%b-%d"),breaks = date_breaks("3 days"))
 
